@@ -5,8 +5,319 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NFC_Reader.UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="NFC TextScanner Pro" 
+        Height="400" 
+        Width="500"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="#2F3136">
+
+    <Window.Resources>
+        <!-- Discord-ähnliche Farben -->
+        <SolidColorBrush x:Key="DiscordDark" Color="#2F3136"/>
+        <SolidColorBrush x:Key="DiscordDarker" Color="#202225"/>
+        <SolidColorBrush x:Key="DiscordBlue" Color="#5865F2"/>
+        <SolidColorBrush x:Key="DiscordGreen" Color="#57F287"/>
+        <SolidColorBrush x:Key="DiscordRed" Color="#ED4245"/>
+        <SolidColorBrush x:Key="DiscordPurple" Color="#9B59B6"/>
+        <SolidColorBrush x:Key="DiscordTextLight" Color="#B9BBBE"/>
+        <SolidColorBrush x:Key="DiscordTextDark" Color="#72767D"/>
+
+        <!-- Button Styles -->
+        <Style x:Key="DiscordButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource DiscordBlue}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" 
+                                Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"
+                                            Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#4752C4"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#3C45A5"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#36393F"/>
+                                <Setter Property="Foreground" Value="#72767D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ExitButton" TargetType="Button" BasedOn="{StaticResource DiscordButton}">
+            <Setter Property="Background" Value="{StaticResource DiscordRed}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#C03B3E"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#A12D30"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="MinimizeButton" TargetType="Button" BasedOn="{StaticResource DiscordButton}">
+            <Setter Property="Background" Value="{StaticResource DiscordGreen}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#46CC72"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#3BA55D"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Text Styles -->
+        <Style x:Key="HeaderText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="StatusText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="{StaticResource DiscordTextLight}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="DetailText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource DiscordTextDark}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Animations -->
+        <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                           From="1.0" To="0.3" Duration="0:0:1"
+                           AutoReverse="True"/>
+        </Storyboard>
+
+        <Storyboard x:Key="FadeInAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                           From="0.0" To="1.0" Duration="0:0:0.5"/>
+        </Storyboard>
+    </Window.Resources>
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}"/>
+        </EventTrigger>
+    </Window.Triggers>
+
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <Border Grid.Row="0" 
+                Background="{StaticResource DiscordDarker}" 
+                Padding="20,20,20,15"
+                CornerRadius="0,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo/Icon -->
+                <Ellipse Grid.Column="0"
+                         Width="40" Height="40"
+                         VerticalAlignment="Center"
+                         Margin="0,0,15,0">
+                    <Ellipse.Fill>
+                        <RadialGradientBrush>
+                            <GradientStop Color="#5865F2" Offset="0"/>
+                            <GradientStop Color="#9B59B6" Offset="1"/>
+                        </RadialGradientBrush>
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <!-- Title -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="NFC TextScanner" 
+                               Style="{StaticResource HeaderText}"
+                               HorizontalAlignment="Left"/>
+                    <TextBlock Text="Professional Edition" 
+                               FontSize="10" 
+                               Foreground="{StaticResource DiscordTextDark}"
+                               HorizontalAlignment="Left"
+                               Margin="0,-5,0,0"/>
+                </StackPanel>
+
+                <!-- Version Info -->
+                <TextBlock Grid.Column="2"
+                           Text="v2.0"
+                           FontSize="10"
+                           Foreground="{StaticResource DiscordTextDark}"
+                           VerticalAlignment="Top"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <StackPanel Grid.Row="1" 
+                    Orientation="Vertical" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center"
+                    Margin="40">
+
+            <!-- Status Indicator -->
+            <Viewbox Width="80" Height="80" Margin="0,0,0,25">
+                <Grid>
+                    <!-- Outer Ring -->
+                    <Ellipse Width="80" Height="80" 
+                             Stroke="{StaticResource DiscordBlue}" 
+                             StrokeThickness="3"
+                             Opacity="0.3"/>
+
+                    <!-- Inner Circle -->
+                    <Ellipse x:Name="StatusIndicator"
+                             Width="60" Height="60">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush>
+                                <GradientStop Color="#57F287" Offset="0"/>
+                                <GradientStop Color="#5865F2" Offset="1"/>
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <!-- NFC Icon (simplified) -->
+                    <Path Fill="White" 
+                          Data="M25,35 Q35,25 45,35 M30,40 Q35,35 40,40 M35,45 L35,47"
+                          Stroke="White" 
+                          StrokeThickness="2"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+                </Grid>
+            </Viewbox>
+
+            <!-- Status Text -->
+            <TextBlock x:Name="StatusText" 
+                       Text="📡 Textscanner aktiv" 
+                       Style="{StaticResource StatusText}"
+                       Margin="0,0,0,8"/>
+
+            <!-- Detail Text -->
+            <TextBlock x:Name="DetailText" 
+                       Text="Bereit für NFC-Karten..." 
+                       Style="{StaticResource DetailText}"
+                       Margin="0,0,0,0"/>
+
+            <!-- Progress Bar (hidden by default) -->
+            <ProgressBar x:Name="ProgressBar"
+                         Width="200"
+                         Height="4"
+                         Margin="0,15,0,0"
+                         Background="#36393F"
+                         Foreground="{StaticResource DiscordGreen}"
+                         Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Info Panel -->
+        <Border Grid.Row="2"
+                Background="#36393F"
+                Padding="20,10"
+                Margin="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Reader Info -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <TextBlock Text="🔌" FontSize="12" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <TextBlock x:Name="ReaderInfo" 
+                               Text="Reader: Erkenne..."
+                               FontSize="10"
+                               Foreground="{StaticResource DiscordTextDark}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Connection Status -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Ellipse x:Name="ConnectionIndicator"
+                             Width="8" Height="8"
+                             Fill="{StaticResource DiscordGreen}"
+                             VerticalAlignment="Center"
+                             Margin="0,0,5,0"/>
+                    <TextBlock x:Name="ConnectionStatus"
+                               Text="Verbunden"
+                               FontSize="10"
+                               Foreground="{StaticResource DiscordTextDark}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Card Count -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="📊" FontSize="12" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <TextBlock x:Name="CardCount" 
+                               Text="Karten: 0"
+                               FontSize="10"
+                               Foreground="{StaticResource DiscordTextDark}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Button Panel -->
+        <StackPanel Grid.Row="3" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    Margin="20,15,20,20">
+
+            <Button x:Name="MinimizeBtn" 
+                    Content="📱 In Hintergrund minimieren" 
+                    Style="{StaticResource MinimizeButton}"
+                    Click="MinimizeBtn_Click"/>
+
+            <Button x:Name="ExitBtn" 
+                    Content="❌ Beenden" 
+                    Style="{StaticResource ExitButton}"
+                    Click="ExitBtn_Click"/>
+        </StackPanel>
     </Grid>
 </Window>
