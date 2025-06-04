@@ -58,7 +58,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\Icons\" />
     <Folder Include="Resources\Sounds\" />
   </ItemGroup>
 
@@ -76,6 +75,12 @@
 
   <ItemGroup>
     <Resource Include="Resources\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Update="Resources\Icons\icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>
