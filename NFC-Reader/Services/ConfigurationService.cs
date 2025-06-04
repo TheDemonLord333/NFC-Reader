@@ -14,7 +14,7 @@ namespace NFC_Reader.Services
     {
         #region Private Fields
         private readonly ILogger<ConfigurationService>? _logger;
-        private readonly IConfiguration _configuration;
+        private IConfiguration _configuration;
         private readonly string _configFilePath;
         private JObject _configObject;
         #endregion

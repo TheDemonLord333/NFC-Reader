@@ -452,12 +452,12 @@ namespace NFC_Reader.UI
 
                 await Task.Delay(500); // Kurz warten für cleanup
 
-                Application.Current.Shutdown();
+                System.Windows.Application.Current.Shutdown();
             }
             catch (Exception ex)
             {
                 _logger?.LogError(ex, "Fehler beim Beenden der Anwendung");
-                Application.Current.Shutdown();
+                System.Windows.Application.Current.Shutdown();
             }
         }
 

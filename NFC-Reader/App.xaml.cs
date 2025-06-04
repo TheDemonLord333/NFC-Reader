@@ -11,7 +11,7 @@ namespace NFC_Reader
     /// <summary>
     /// Hauptanwendungsklasse mit Dependency Injection Container
     /// </summary>
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         #region Private Fields
         private ServiceProvider? _serviceProvider;
@@ -26,7 +26,7 @@ namespace NFC_Reader
                 // Prüfe auf bereits laufende Instanz
                 if (IsAnotherInstanceRunning())
                 {
-                    MessageBox.Show(
+                    System.Windows.MessageBox.Show(
                         "NFC TextScanner läuft bereits!\n\nPrüfen Sie das System Tray (^) in der Taskleiste.",
                         "Information",
                         MessageBoxButton.OK,
@@ -93,10 +93,7 @@ namespace NFC_Reader
             // Logging konfigurieren
             services.AddLogging(builder =>
             {
-                builder.AddConsole();
-                builder.AddDebug();
                 builder.SetMinimumLevel(LogLevel.Debug);
-
                 // File Logging (einfache Implementierung)
                 builder.AddProvider(new FileLoggerProvider());
             });
@@ -136,7 +133,7 @@ namespace NFC_Reader
             {
                 _logger?.LogError(e.Exception, "Unbehandelte Exception im UI Thread");
 
-                var result = MessageBox.Show(
+                var result = System.Windows.MessageBox.Show(
                     $"Ein unerwarteter Fehler ist aufgetreten:\n\n{e.Exception.Message}\n\nMöchten Sie die Anwendung dennoch weiterlaufen lassen?",
                     "Unerwarteter Fehler",
                     MessageBoxButton.YesNo,
@@ -160,7 +157,7 @@ namespace NFC_Reader
                 {
                     _logger?.LogCritical("Anwendung wird beendet (IsTerminating=true)");
 
-                    MessageBox.Show(
+                    System.Windows.MessageBox.Show(
                         $"Ein kritischer Fehler ist aufgetreten:\n\n{exception?.Message}\n\nDie Anwendung wird beendet.",
                         "Kritischer Fehler",
                         MessageBoxButton.OK,
@@ -195,7 +192,7 @@ namespace NFC_Reader
                                "• Führen Sie die Anwendung als Administrator aus";
             }
 
-            MessageBox.Show(
+            System.Windows.MessageBox.Show(
                 errorMessage,
                 "Startfehler - NFC TextScanner",
                 MessageBoxButton.OK,
