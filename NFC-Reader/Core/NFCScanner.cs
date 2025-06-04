@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using PCSC;
 using PCSC.Exceptions;
 using PCSC.Monitoring;
-using PCSC.Iso7816;
 using Microsoft.Extensions.Logging;
 
 namespace NFC_Reader.Core
@@ -258,20 +257,22 @@ namespace NFC_Reader.Core
             try
             {
                 // NTAG-Karten (NTAG213, NTAG215, NTAG216) lesen
-                var command = new CommandApdu(IsoCase.Case2Short, reader.Protocol)
-                {
-                    CLA = 0xFF,
-                    INS = 0xB0,    // READ BINARY
-                    P1 = 0x00,
-                    P2 = 0x04,     // Start bei Seite 4 (NDEF Daten)
-                    Le = 16        // 16 Bytes lesen
-                };
+                byte[] command = { 0xFF, 0xB0, 0x00, 0x04, 0x10 }; // READ BINARY, Start bei Seite 4, 16 Bytes
 
-                var response = reader.Transmit(command);
+                byte[] response = new byte[18]; // 16 Bytes Daten + 2 Bytes Status
+                int bytesReceived = reader.Transmit(command, response);
 
-                if (response.SW1 == 0x90 && response.SW2 == 0x00)
+                if (bytesReceived >= 2)
                 {
-                    return ParseNDEFText(response.GetData());
+                    byte sw1 = response[bytesReceived - 2];
+                    byte sw2 = response[bytesReceived - 1];
+
+                    if (sw1 == 0x90 && sw2 == 0x00)
+                    {
+                        byte[] data = new byte[bytesReceived - 2];
+                        Array.Copy(response, 0, data, 0, bytesReceived - 2);
+                        return ParseNDEFText(data);
+                    }
                 }
 
                 return "Fehler beim Lesen der NTAG-Karte";
@@ -289,34 +290,36 @@ namespace NFC_Reader.Core
             {
                 // MIFARE Classic Karte lesen
                 // Authentifizierung mit Standard-Schlüssel
-                var authCommand = new CommandApdu(IsoCase.Case3Short, reader.Protocol)
+                byte[] loadKeyCommand = { 0xFF, 0x82, 0x00, 0x00, 0x06, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+                byte[] authResponse = new byte[2];
+                int authBytes = reader.Transmit(loadKeyCommand, authResponse);
+
+                if (authBytes >= 2 && authResponse[0] == 0x90)
                 {
-                    CLA = 0xFF,
-                    INS = 0x86,    // LOAD KEY
-                    P1 = 0x00,
-                    P2 = 0x00,
-                    Data = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF } // Standard-Schlüssel
-                };
+                    // Authentifizierung für Block 4
+                    byte[] authCommand = { 0xFF, 0x86, 0x00, 0x00, 0x05, 0x01, 0x00, 0x04, 0x60, 0x00 };
+                    byte[] authResult = new byte[2];
+                    int authResultBytes = reader.Transmit(authCommand, authResult);
 
-                var authResponse = reader.Transmit(authCommand);
-
-                if (authResponse.SW1 == 0x90)
-                {
-                    // Block 4 lesen (erster Datenblock)
-                    var readCommand = new CommandApdu(IsoCase.Case2Short, reader.Protocol)
+                    if (authResultBytes >= 2 && authResult[0] == 0x90)
                     {
-                        CLA = 0xFF,
-                        INS = 0xB0,
-                        P1 = 0x00,
-                        P2 = 0x04,
-                        Le = 16
-                    };
+                        // Block 4 lesen
+                        byte[] readCommand = { 0xFF, 0xB0, 0x00, 0x04, 0x10 };
+                        byte[] readResponse = new byte[18];
+                        int readBytes = reader.Transmit(readCommand, readResponse);
 
-                    var readResponse = reader.Transmit(readCommand);
+                        if (readBytes >= 2)
+                        {
+                            byte sw1 = readResponse[readBytes - 2];
+                            byte sw2 = readResponse[readBytes - 1];
 
-                    if (readResponse.SW1 == 0x90)
-                    {
-                        return Encoding.UTF8.GetString(readResponse.GetData()).TrimEnd('\0');
+                            if (sw1 == 0x90 && sw2 == 0x00)
+                            {
+                                byte[] data = new byte[readBytes - 2];
+                                Array.Copy(readResponse, 0, data, 0, readBytes - 2);
+                                return Encoding.UTF8.GetString(data).TrimEnd('\0');
+                            }
+                        }
                     }
                 }
 
@@ -334,21 +337,22 @@ namespace NFC_Reader.Core
             try
             {
                 // Generisches Lesen für unbekannte Kartentypen
-                var command = new CommandApdu(IsoCase.Case2Short, reader.Protocol)
-                {
-                    CLA = 0x00,
-                    INS = 0xB0,
-                    P1 = 0x00,
-                    P2 = 0x00,
-                    Le = 256
-                };
+                byte[] command = { 0x00, 0xB0, 0x00, 0x00, 0x00 }; // READ BINARY
+                byte[] response = new byte[258]; // Maximale Antwort
+                int bytesReceived = reader.Transmit(command, response);
 
-                var response = reader.Transmit(command);
-
-                if (response.HasData)
+                if (bytesReceived > 2)
                 {
-                    var text = Encoding.UTF8.GetString(response.GetData());
-                    return text.TrimEnd('\0', ' ');
+                    byte sw1 = response[bytesReceived - 2];
+                    byte sw2 = response[bytesReceived - 1];
+
+                    if (sw1 == 0x90 && sw2 == 0x00)
+                    {
+                        byte[] data = new byte[bytesReceived - 2];
+                        Array.Copy(response, 0, data, 0, bytesReceived - 2);
+                        var text = Encoding.UTF8.GetString(data);
+                        return text.TrimEnd('\0', ' ');
+                    }
                 }
 
                 return "Keine lesbaren Daten auf der Karte gefunden";
