@@ -244,7 +244,7 @@ namespace NFC_Reader.Core
                 {
                     try
                     {
-                        originalClipboard = Clipboard.GetText();
+                        originalClipboard = System.Windows.Clipboard.GetText();
                     }
                     catch
                     {
@@ -253,7 +253,7 @@ namespace NFC_Reader.Core
                 }
 
                 // Text in Clipboard kopieren
-                Clipboard.SetText(text);
+                System.Windows.Clipboard.SetText(text);
                 Thread.Sleep(DelayBeforeInjection);
 
                 // Ctrl+V simulieren
@@ -270,7 +270,7 @@ namespace NFC_Reader.Core
                     {
                         try
                         {
-                            Clipboard.SetText(originalClipboard);
+                            System.Windows.Clipboard.SetText(originalClipboard);
                         }
                         catch
                         {

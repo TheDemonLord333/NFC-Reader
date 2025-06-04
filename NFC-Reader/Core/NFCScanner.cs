@@ -253,7 +253,7 @@ namespace NFC_Reader.Core
         }
 
         #region Card Reading Methods
-        private async Task<string> ReadNTAGCardAsync(ISCardReader reader)
+        private async Task<string> ReadNTAGCardAsync(ICardReader reader)
         {
             try
             {
@@ -283,7 +283,7 @@ namespace NFC_Reader.Core
             }
         }
 
-        private async Task<string> ReadMifareCardAsync(ISCardReader reader)
+        private async Task<string> ReadMifareCardAsync(ICardReader reader)
         {
             try
             {
@@ -329,7 +329,7 @@ namespace NFC_Reader.Core
             }
         }
 
-        private async Task<string> ReadGenericCardAsync(ISCardReader reader)
+        private async Task<string> ReadGenericCardAsync(ICardReader reader)
         {
             try
             {

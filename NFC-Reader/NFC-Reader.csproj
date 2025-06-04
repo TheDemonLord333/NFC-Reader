@@ -31,13 +31,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- NFC & Smart Card Libraries -->
-    <PackageReference Include="PCSC" Version="6.2.0" />
-    <PackageReference Include="PCSC.Iso7816" Version="6.2.0" />
-    
-    <!-- Windows Forms & Drawing -->
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
-    <PackageReference Include="System.Windows.Forms" Version="8.0.0" />
+    <!-- NFC & Smart Card Libraries - Aktualisierte Versionen -->
+    <PackageReference Include="PCSC" Version="7.0.0" />
+    <PackageReference Include="PCSC.Iso7816" Version="7.0.0" />
     
     <!-- Configuration & Logging -->
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
@@ -50,11 +46,6 @@
     
     <!-- Audio for notifications -->
     <PackageReference Include="NAudio" Version="2.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Security" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Forms;
+using WinForms = System.Windows.Forms;
 using Microsoft.Extensions.Logging;
 using NFC_Reader.Core;
 using Application = System.Windows.Application;
@@ -17,8 +17,8 @@ namespace NFC_Reader.UI
     {
         #region Private Fields
         private readonly ILogger<SystemTrayManager>? _logger;
-        private NotifyIcon? _notifyIcon;
-        private ContextMenuStrip? _contextMenu;
+        private WinForms.NotifyIcon? _notifyIcon;
+        private WinForms.ContextMenuStrip? _contextMenu;
         private readonly Window _mainWindow;
         private bool _disposed = false;
         #endregion
@@ -90,7 +90,7 @@ namespace NFC_Reader.UI
         /// <summary>
         /// Zeigt eine Ballon-Benachrichtigung
         /// </summary>
-        public void ShowBalloonTip(string title, string text, ToolTipIcon icon = ToolTipIcon.Info, int timeout = 3000)
+        public void ShowBalloonTip(string title, string text, WinForms.ToolTipIcon icon = WinForms.ToolTipIcon.Info, int timeout = 3000)
         {
             if (_notifyIcon?.Visible == true)
             {
@@ -104,7 +104,7 @@ namespace NFC_Reader.UI
         /// </summary>
         public void ShowSuccess(string message)
         {
-            ShowBalloonTip("✅ Erfolg", message, ToolTipIcon.Info);
+            ShowBalloonTip("✅ Erfolg", message, WinForms.ToolTipIcon.Info);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace NFC_Reader.UI
         /// </summary>
         public void ShowWarning(string message)
         {
-            ShowBalloonTip("⚠️ Warnung", message, ToolTipIcon.Warning);
+            ShowBalloonTip("⚠️ Warnung", message, WinForms.ToolTipIcon.Warning);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace NFC_Reader.UI
         /// </summary>
         public void ShowError(string message)
         {
-            ShowBalloonTip("❌ Fehler", message, ToolTipIcon.Error);
+            ShowBalloonTip("❌ Fehler", message, WinForms.ToolTipIcon.Error);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace NFC_Reader.UI
         public void ShowCardDetected(NFCCard card)
         {
             var message = $"Text eingefügt: {card.Text?.Substring(0, Math.Min(card.Text.Length, 50))}...";
-            ShowBalloonTip("📡 NFC-Karte erkannt", message, ToolTipIcon.Info);
+            ShowBalloonTip("📡 NFC-Karte erkannt", message, WinForms.ToolTipIcon.Info);
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace NFC_Reader.UI
         {
             try
             {
-                _notifyIcon = new NotifyIcon
+                _notifyIcon = new WinForms.NotifyIcon
                 {
                     Icon = CreateDefaultIcon(),
                     Text = StatusText,
@@ -178,42 +178,42 @@ namespace NFC_Reader.UI
 
         private void CreateContextMenu()
         {
-            _contextMenu = new ContextMenuStrip();
+            _contextMenu = new WinForms.ContextMenuStrip();
 
             // Styling für Discord-ähnliches Aussehen
             _contextMenu.BackColor = Color.FromArgb(54, 57, 63);
             _contextMenu.ForeColor = Color.White;
-            _contextMenu.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
+            _contextMenu.Font = new Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular);
 
             // Menü-Einträge
-            var openItem = new ToolStripMenuItem("🔓 Öffnen")
+            var openItem = new WinForms.ToolStripMenuItem("🔓 Öffnen")
             {
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+                Font = new Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold)
             };
             openItem.Click += (s, e) => OnShowWindowRequested();
 
-            var settingsItem = new ToolStripMenuItem("⚙️ Einstellungen");
+            var settingsItem = new WinForms.ToolStripMenuItem("⚙️ Einstellungen");
             settingsItem.Click += (s, e) => ShowSettings();
 
-            var aboutItem = new ToolStripMenuItem("ℹ️ Info");
+            var aboutItem = new WinForms.ToolStripMenuItem("ℹ️ Info");
             aboutItem.Click += (s, e) => ShowAbout();
 
-            var separator = new ToolStripSeparator();
+            var separator = new WinForms.ToolStripSeparator();
 
-            var exitItem = new ToolStripMenuItem("❌ Beenden")
+            var exitItem = new WinForms.ToolStripMenuItem("❌ Beenden")
             {
                 ForeColor = Color.FromArgb(237, 66, 69) // Discord Red
             };
             exitItem.Click += (s, e) => OnExitApplicationRequested();
 
             // Menü zusammenstellen
-            _contextMenu.Items.AddRange(new ToolStripItem[]
+            _contextMenu.Items.AddRange(new WinForms.ToolStripItem[]
             {
                 openItem,
                 separator,
                 settingsItem,
                 aboutItem,
-                new ToolStripSeparator(),
+                new WinForms.ToolStripSeparator(),
                 exitItem
             });
         }
@@ -225,7 +225,7 @@ namespace NFC_Reader.UI
             // Doppelklick zum Öffnen
             _notifyIcon.MouseDoubleClick += (s, e) =>
             {
-                if (e.Button == MouseButtons.Left)
+                if (e.Button == WinForms.MouseButtons.Left)
                 {
                     OnShowWindowRequested();
                 }
@@ -240,7 +240,7 @@ namespace NFC_Reader.UI
             // Mausklick für Feedback
             _notifyIcon.MouseClick += (s, e) =>
             {
-                if (e.Button == MouseButtons.Left)
+                if (e.Button == WinForms.MouseButtons.Left)
                 {
                     // Kurzes visuelles Feedback
                     BlinkIcon(1);
